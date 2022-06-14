@@ -30,7 +30,9 @@ func _plus(bytes []byte, idx int, add int) []byte {
 
 	b := bytes[idx]
 	my_add := 0
-	//if we hit 9,z,Z
+
+	//plus 1 or add
+	//if we hit 9,z,Z, plus 1, change to another section
 	if b == 57 || b == 122 || b == 90 {
 		if b == 57 {
 			bytes[idx] = byte(97)
@@ -41,9 +43,11 @@ func _plus(bytes []byte, idx int, add int) []byte {
 			my_add = 1
 		}
 	} else {
+		//tail ele always plus 1
 		if idx == len(bytes) - 1 {
 			bytes[idx] += byte(1)
 		} else {
+			//middle ele may plus add
 			bytes[idx] += byte(add)
 		}
 	}
