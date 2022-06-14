@@ -17,7 +17,7 @@ func TestConvert2_62ruler(t *testing.T) {
 }
 
 func plus(bytes []byte) []byte{
-	return _plus(bytes, len(bytes) - 1, 0)
+	return _plus(bytes, len(bytes) - 1, 1)
 }
 
 func _plus(bytes []byte, idx int, add int) []byte {
@@ -27,11 +27,14 @@ func _plus(bytes []byte, idx int, add int) []byte {
 		}
 		return bytes
 	}
+	if add == 0 {
+		return bytes
+	}
 
 	b := bytes[idx]
 	my_add := 0
 
-	//plus 1 or add
+	//plus 1
 	//if we hit 9,z,Z, plus 1, change to another section
 	if b == 57 || b == 122 || b == 90 {
 		if b == 57 {
@@ -44,17 +47,7 @@ func _plus(bytes []byte, idx int, add int) []byte {
 		}
 	} else {
 		//tail ele always plus 1
-		if idx == len(bytes) - 1 {
-			bytes[idx] += byte(1)
-		} else {
-			//middle ele may plus add
-			bytes[idx] += byte(add)
-		}
+		bytes[idx] += byte(1)
 	}
-	if my_add > 0 {
-		idx = idx - 1
-	} else {
-		idx = -1
-	}
-	return _plus(bytes, idx, my_add)
+	return _plus(bytes, idx - 1, my_add)
 }
