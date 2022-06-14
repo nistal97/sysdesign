@@ -6,10 +6,9 @@ type auto_increment struct {
 
 //A..Za..z0..9
 func Convert2_62ruler(n uint64)*[]byte {
-	s := []byte{48,48,48,48,48,48}
-	i := 5
+	s := []byte{}
 	for {
-		if n == 0 || i < 0 {
+		if n == 0  {
 			break
 		}
 		mod := byte(n % 62)
@@ -21,9 +20,17 @@ func Convert2_62ruler(n uint64)*[]byte {
 		} else {
 			offset = 65 + mod - 36
 		}
-		s[i] = offset
+		s = append([]byte{offset}, s...)
 		n /= 62
-		i --
 	}
 	return &s
 }
+
+
+
+
+
+
+
+
+
