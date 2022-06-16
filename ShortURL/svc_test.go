@@ -12,7 +12,7 @@ import b "github.com/nistal97/sysdesign/ShortURL/bitly"
 func TestConvert2_62ruler(t *testing.T) {
 	v := []byte{49}
 	for i := float64(1);i < math.Pow(62.0, 4.0);i ++ {
-		require.True(t, bytes.Compare(*b.Convert2_62ruler(uint64(i)), v) == 0)
+		require.True(t, bytes.Compare(*b.EncodeNum2Bytes(uint64(i)), v) == 0)
 		v = plus(v)
 	}
 }
