@@ -41,13 +41,24 @@ func (c *i_cache) Put(k interface{}, v interface{}) error {
 			return errors.New("invalid type provided")
 		}
 
+		if c._map[idx] == nil {
+			c._map[idx] = make(map[interface{}]interface{}, c.bcache.cap)
+		}
+
+		exist_key, bexist := c._map[idx][k]
+
 		if c.lists[idx].Len() == c.bcache.limit {
 			var old_k *l.Element
-			if c.bcache.stra == LRU {
-				old_k = c.lists[idx].Back()
-			} else if c.bcache.stra == MRU {
-				old_k = c.lists[idx].Front()
+			if bexist {
+				old_k = (*l.Element)(exist_key.(val).lp)
+			} else {
+				if c.bcache.stra == LRU {
+					old_k = c.lists[idx].Back()
+				} else if c.bcache.stra == MRU {
+					old_k = c.lists[idx].Front()
+				}
 			}
+
 			c.lists[idx].Remove(old_k)
 			delete(c._map[idx], old_k.Value)
 			c.bcache._setsize(c.bcache._size - 1)
@@ -55,15 +66,14 @@ func (c *i_cache) Put(k interface{}, v interface{}) error {
 			c._updateType(k, v)
 		}
 
-		if c._map[idx] == nil {
-			c._map[idx] = make(map[interface{}]interface{}, c.bcache.cap)
-		}
 		c.lists[idx].PushFront(k)
 		c._map[idx][k] = val{
 			_v: v,
 			lp: unsafe.Pointer(c.lists[idx].Front()),
 		}
-		c.bcache._setsize(c.bcache._size + 1)
+		if !bexist {
+			c.bcache._setsize(c.bcache._size + 1)
+		}
 	}
 	return nil
 

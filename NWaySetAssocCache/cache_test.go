@@ -120,6 +120,27 @@ func TestPutGetRemove(t *testing.T) {
 	}
 }
 
+func TestLRUReplacement(t *testing.T) {
+	if cache, err := c.GetCache(4, 4, c.LRU); err != nil {
+		fmt.Printf("Error occured:%s\n", err)
+	} else {
+		cache.Put("test1111", "didthiswork?")
+		cache.Put("Sam", "Iam")
+		cache.Put("Green", "EggsAndHam")
+		cache.Put("alacazathrus", "shazzam")
+		cache.Put("alacazathrus", "smiggitybushnu")
+
+		v, _ := cache.Get("alacazathrus")
+		require.True(t, v == "smiggitybushnu")
+		v, _ = cache.Get("test1111")
+		require.True(t, v == "didthiswork?")
+		v, _ = cache.Contains("Sam")
+		require.True(t, v == true)
+		v, _ = cache.Contains("Green")
+		require.True(t, v == true)
+	}
+}
+
 func TestConcurrent(t *testing.T) {
 	if cache, err := c.GetCache(4, 4, c.LRU); err != nil {
 		fmt.Printf("Error occured:%s\n", err)
