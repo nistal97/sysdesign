@@ -35,6 +35,8 @@ func (m *BitlyCodec) Encode(url string) string {
 }
 
 func (m *BitlyCodec) Decode(url string) string {
+	m.buckets[m.locate(url)].lck.Lock()
+	defer m.buckets[m.locate(url)].lck.Unlock()
 	if bs, ok := m.buckets[m.locate(url)].hosts[url]; ok {
 		return bs
 	}
