@@ -2,12 +2,22 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/stretchr/testify/require"
 	"math"
 	"testing"
 )
 
 import b "github.com/nistal97/sysdesign/ShortURL/bitly"
+
+func TestEncodeThenDecode(t *testing.T) {
+	codec := b.GetShortURLCodec()
+	for i := 0;i < 1000;i ++ {
+		shorturl := codec.Encode("http://www.google.com")
+		fmt.Println(shorturl)
+		require.True(t, codec.Decode(shorturl) == "http://www.google.com")
+	}
+}
 
 func TestConvert2_62ruler(t *testing.T) {
 	v := []byte{49}

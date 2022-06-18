@@ -1,12 +1,21 @@
 package bitly
 
-type codec interface {
-	Encode(url string)*[]byte
-	Decode(url string)*[]byte
-}
+const (
+	BUCKET_SIZE = 62
+	DOMAIN = "https://bitly.com/"
+)
 
 type ShortURLCodec interface {
-	codec
+	Encode(url string)string
+	Decode(url string)string
+}
+
+func GetShortURLCodec() ShortURLCodec {
+	c := &BitlyCodec{
+		buckets: make([]bucket, BUCKET_SIZE, BUCKET_SIZE),
+	}
+
+	return c
 }
 
 

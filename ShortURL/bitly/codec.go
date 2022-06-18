@@ -1,23 +1,48 @@
 package bitly
 
-import "sync"
-
-const (
-	NUM_MAP    = 0x00
-	HASH_MAP   = 0x01
+import (
+	"hash/crc32"
+	"sync"
+	"sync/atomic"
 )
 
 type BitlyCodec struct {
 	Generator int
 	daemon sync.Once
+	buckets []bucket
+	counter uint64
 }
 
-func (m *BitlyCodec) Encode(url string) *[]byte {
-	m.daemon.Do(func() {
+type bucket struct {
+	lck sync.Mutex
+	hosts map[string]string
+}
 
-	})
 
-	return nil
+func (m *BitlyCodec) Encode(url string) string {
+	atomic.AddUint64(&m.counter, 1)
+	_k := EncodeNum2Bytes(m.counter)
+	k := DOMAIN + string(*_k)
+
+	m.buckets[m.locate(k)].lck.Lock()
+	defer m.buckets[m.locate(k)].lck.Unlock()
+	if m.buckets[m.locate(k)].hosts == nil {
+		m.buckets[m.locate(k)].hosts = make(map[string]string)
+	}
+
+	m.buckets[m.locate(k)].hosts[k] = url
+	return k
+}
+
+func (m *BitlyCodec) Decode(url string) string {
+	if bs, ok := m.buckets[m.locate(url)].hosts[url]; ok {
+		return bs
+	}
+	return ""
+}
+
+func (m *BitlyCodec) locate(url string) int {
+	return int(crc32.ChecksumIEEE([]byte(url))) % 62
 }
 
 //A..Za..z0..9
