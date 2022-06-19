@@ -44,7 +44,7 @@ func (m *BitlyCodec) Decode(url string) string {
 }
 
 func (m *BitlyCodec) locate(url string) int {
-	return int(crc32.ChecksumIEEE([]byte(url))) % 62
+	return int(crc32.ChecksumIEEE([]byte(url))) % BUCKET_SIZE
 }
 
 //A..Za..z0..9
@@ -54,7 +54,7 @@ func EncodeNum2Bytes(n uint64)*[]byte {
 		if n == 0  {
 			break
 		}
-		mod := byte(n % 62)
+		mod := byte(n % BUCKET_SIZE)
 		offset := byte(0)
 		if mod < 10 {
 			offset = 48 + mod
@@ -64,7 +64,7 @@ func EncodeNum2Bytes(n uint64)*[]byte {
 			offset = 65 + mod - 36
 		}
 		s = append([]byte{offset}, s...)
-		n /= 62
+		n /= BUCKET_SIZE
 	}
 	return &s
 }
